@@ -12,7 +12,30 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+set.seed(42)
 ```
+
+## Boring stuff first: Expectation for class
+
+* We will start and finish on time
+* Attendance is expected
+* All due dates are final outside of excused absences
+* You are checking your UToledo email
+* You have read and understand the Syllabus
+* For all classroom experiments, at least one person will be paid. You will understand the payment mechanism before starting an experiment.
+
+## What will we be studying?
+
+* Insights from Psychology
+  + Especially judgment & decision-making
+* Extensions of "standard" (non-behavioral) economic theory
+  + Markets
+  + Choice theory
+  + Games
+* Experimental methods
+* Non-experimental methods
+
 
 
 ## Doing economic research without experiments
@@ -95,6 +118,106 @@ Further reading:
 
 > Nikiforakis, Nikos. ["For the student: experimental economics."](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1467-8462.2010.00607.x?casa_token=K6AYdLRDvdAAAAAA%3AideO69vzWNyKiBui76sE4jOLASAPBw0JoDZ97Uxy0POWYZ_pOV-T1feeFWAOtUdY9fWIYXcFSNGe3RJ6) Australian Economic Review 43, no. 3 (2010): 337-345.
 
+
+## Studying theoretical predictions - I
+
+Suppose that you have a theory that makes a prediction $f(x)$ for situation $x$.
+
+e.g.:
+
+*  When the temperature is $x^\circ\mathrm F$, $f(x)=10+3x$ pints of ice cream will be sold
+
+**Point predictions**: Given situation $x$, $f(x)$ will happen
+
+* When the temperature is $90^\circ \mathrm F$, $280 = 10 + 3\times 90$ pints of ice cream will be sold
+
+**Comparative static predictions**: When $x$ increases, $f(x)$ increases (or decreases, or nothing happens to $f(x)$)
+
+* When temperature increases, ice cream sales increase. 
+* When temperature increases by $1^\circ \mathrm F$, ice cream sales increase by 3 pints.
+
+*When are each of these useful?*
+
+## Studying theoretical predictions - II
+
+**Comparing two or more theories**
+
+I have two theories about how $x$ affects an outcome. These theories are $f(x)$ and $g(x)$. I wish to understand whether one makes better predictions than another.
+
+```{r Intro-comparing-theories,fig.width=10,fig_height=8}
+x<-seq(0,1,length=101)
+y<-x*(1-x)
+pltData<-data.frame(y,x)
+pltData$Theory <- "f(x)"
+tmp<-pltData
+tmp$y<-x
+tmp$Theory<-"g(x)"
+pltData<-rbind(pltData,tmp)
+
+xdata<-runif(n=1000)
+ydata<-1/(1+exp(-((log(xdata)-log((1-xdata)))+0.2*rnorm(n=1000))))
+dataXY<-data.frame(xdata,ydata)
+
+plt<-(
+  ggplot(pltData,aes(x=x,y=y,color=Theory))
+  +geom_line(size=2)
+  +geom_point(data=dataXY,aes(x=xdata,y=ydata),size=0.5,color="black")
+  +theme_bw()
+  +xlab("x")
+  +ylab("")
+)
+plt
+```
+
+## Studying theoretical predictions - III
+
+**Comparing two or more theories**: Sometimes both are important!
+
+```{r Intro-comparing-theories-III,fig.width=10,fig_height=8}
+
+xdata<-runif(n=1000)
+group<-(runif(n=1000)<0.7)
+yprediction<-xdata*(1-xdata)
+yprediction[group]<-xdata[group]
+
+ydata<-  1/(1+exp(-((log(yprediction)-log((1-yprediction)))+0.4*rnorm(n=1000))))
+dataXY<-data.frame(xdata,ydata)
+
+plt<-(
+  ggplot(pltData,aes(x=x,y=y,color=Theory))
+  +geom_line(size=2)
+  +geom_point(data=dataXY,aes(x=xdata,y=ydata),size=0.5,color="black")
+  +theme_bw()
+  +xlab("x")
+  +ylab("")
+)
+plt
+```
+
+## Studying theoretical predictions - IV
+
+**Comparing two or more theories**: Sometimes they are all useless
+
+```{r Intro-comparing-theories-IV,fig.width=10,fig_height=8}
+
+xdata<-runif(n=1000)
+
+yprediction<-1-xdata
+
+ydata<-  1/(1+exp(-((log(yprediction)-log((1-yprediction)))+0.4*rnorm(n=1000))))
+dataXY<-data.frame(xdata,ydata)
+
+plt<-(
+  ggplot(pltData,aes(x=x,y=y,color=Theory))
+  +geom_line(size=2)
+  +geom_point(data=dataXY,aes(x=xdata,y=ydata),size=0.5,color="black")
+  +theme_bw()
+  +xlab("x")
+  +ylab("")
+)
+plt
+```
+
 ## Economic experiments and causality
 
 Conduct a study that resembles a drug trial.
@@ -136,6 +259,8 @@ Inside the lab:
 * We can assign buyers and sellers values and costs
 * Hence, we know what the theory predicts, and we can observe the outcomes.
 
+
+
 ## A roadmap for this course
 
 Usually, I will introduce a topic with an experiment.
@@ -146,14 +271,27 @@ We will discuss this in the next class
 
 For 6260 students, we will use our extra hour mostly as a reading group. I will assign the first few readings, but I am very open to suggestions. 
 
-For next class
+## Outline of topics covered (not necessarily in order)
 
-* Everyone:
-  + Make sure you understand the syllabus
-  + Complete Problem Set 1 using the data from today's experiment
-  + Read Chapter 1 of *Markets, Games, and Strategic Behavior*. This chapter is available online [here](https://press.princeton.edu/books/hardcover/9780691179247/markets-games-and-strategic-behavior).
-* 6260 students:
-  + xxx
+* Game theory
+  + How do economists model interactions in small groups?
+  + Key concepts: Nash Equilibrium, best response, mixed and pure strategies
+  + Single-shot games, sequential games, Bayesian games
+* Behavioral Game Theory
+  + Incorporating insights from decision theory into game theory
+  + Noisy behavior in equilibrium
+  + Other departures from the *Homo Economicus* assumption
+  + Non-standard preferences
+* Preferences & Decisions
+  + Risk
+  + Probability judgment
+  + Other-regarding preferences
+  
+
+  
+
+
+
 
 
 
