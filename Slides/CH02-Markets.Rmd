@@ -1,0 +1,88 @@
+---
+title: "ECON 4/6260 - Behaviroal Economics"
+subtitle: "02 - Markets"
+author: "Dr. James Bland"
+
+
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+set.seed(42)
+```
+
+## Markets
+
+* Probably one of the first things you learned about in a *Principles of Microeconomics* course
+
+* A group of buyers, each with values for purchasing items
+  + Implies a downward-sloping demand curve
+* A group of sellers, each with costs of selling item
+  + Implies an upward-sloping supply curve
+
+* This is enough to calculate the equilibrium price and quantity
+
+However:
+* One cannot just ask buyers what there values are
+* One cannot just ask sellers what their values are
+
+(why not?)
+
+## An experiment
+
+...
+
+## Induced value theory
+
+Simple version: *Pay people enough money, and they will behave as if these are their incentives*
+
+More formally, if for a participant in an experiment:
+* taking action $a$ results in payment $A
+* taking action $b$ results in payment $B
+
+Then they will only choose action $a$ if $A \geq B$, and will only choose action $b$ if $B\geq A$.
+
+**Caveats**: $A$ and $B$ need to be large enough that participants pay attention to them (salience)
+
+* Don't pay in Monopoly money, chocolate, etc
+* Maintain assumption that participants don't care about the earnings of others (selfishness)
+* Participants need to understand how their actions lead to payments
+* Participants need to believe that their actions will lead to payments
+
+## In market experiments
+
+* Each buyer $i$ has values $v_{i,1}\geq v_{i,2}\geq v_{i,3} \ldots$.
+* Each seller $j$ has costs $c_{i,1}\leq c_{i,2}\leq c_{i,3} \ldots$.
+* If buyer $i$ buys from seller $j$ at price $p$:
+  + Buyer $i$ earns $\$ v_{i,1}-p$
+  + Seller $j$ earns $\$ p-c_{j,1}$
+  
+(if this is the first trade for both)
+
+## Predictions from markets
+
+* Equilibrium price and quantity (point)
+* Which buyers trade, and which sellers trade (point)
+* Consumer and producer surplus (point)
+
+* What happens to any of the above if: (comparative static and point)
+  + Supply or demand shift?
+  + The government imposes a tax?
+  + The government subsidizes the good?
+  + The government imposes a price floor or ceiling?
+  
+## Other take-aways
+
+* Market theory remains silent on *how* buyers and sellers discover the equilibrium price
+* Market theory remains silent on whether different trading mechanisms affect price discovery.
+
+
+
+
+
+
