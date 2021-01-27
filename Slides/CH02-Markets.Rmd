@@ -10,9 +10,14 @@ output:
     smaller: true
 ---
 
+<style>
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 library(ggplot2)
+library(dplyr)
 set.seed(42)
 ```
 
@@ -64,17 +69,174 @@ Then they will only choose action $a$ if $A \geq B$, and will only choose action
   
 (if this is the first trade for both)
 
-## Predictions from markets
 
-* Equilibrium price and quantity (point)
-* Which buyers trade, and which sellers trade (point)
-* Consumer and producer surplus (point)
+## Numerical example - Buyers
 
-* What happens to any of the above if: (comparative static and point)
-  + Supply or demand shift?
-  + The government imposes a tax?
-  + The government subsidizes the good?
-  + The government imposes a price floor or ceiling?
+<div style="float: left; width: 60%;">
+
+There are 10 buyers, each buyer has a value equal to a 15-sided die roll plus 3, and can buy at most 3 items:
+```{r,echo=T}
+set.seed(42)
+nBuyers<-10
+nItems<-3
+Demand<-data.frame()
+for (bb in 1:nBuyers) {
+  # value for that individual buyer
+  v<-sample(1:15,nItems,replace=T)+3
+  tmp<-data.frame(v)
+  tmp$BuyerID<-bb
+  Demand<-rbind(Demand,tmp)
+}
+plt<-(
+  ggplot(data=Demand,aes(x=v))+geom_histogram(bins=10)
+  +theme_bw()
+  +xlab("Values")
+  +ylab("count")
+)
+
+```
+</div>
+
+<div style="float: left; width: 40%;">
+```{r, echo=F,fig.width=4}
+print(plt)
+```
+
+## Numerical example - Sellers
+
+<div style="float: left; width: 60%;">
+
+There are 20 sellers, each seller has a cost equal to a 10-sided die roll, and can sell at most 2 items:
+```{r,echo=T}
+nSellers<-10
+nItems<-2
+Supply<-data.frame()
+for (ss in 1:nSellers) {
+  # value for that individual buyer
+  c<-sample(1:10,nItems,replace=T)
+  tmp<-data.frame(c)
+  tmp$SellerID<-ss
+  Supply<-rbind(Supply,tmp)
+}
+plt<-(
+  ggplot(data=Supply,aes(x=c))+geom_histogram(bins=10)
+  +theme_bw()
+  +xlab("Costs")
+  +ylab("count")
+)
+
+```
+</div>
+
+<div style="float: left; width: 40%;">
+```{r, echo=F,fig.width=4}
+print(plt)
+```
+
+
+## Numerical example - Supply and demand curves
+
+<div style="float: left; width: 60%;">
+```{r, echo=T}
+P<-seq(0,20,length=1000) # prices to evaluate quantity
+SF<-function(p) {
+  sum(Supply$c<=p)
+}
+DF<-function(p) {
+  sum(Demand$v>=p)
+}
+
+SupplyDemand<-data.frame()
+for (pp in P) {
+  p<-pp
+  Q<-DF(pp)
+  type="demand"
+  SupplyDemand<-rbind(SupplyDemand,data.frame(p,Q,type))
+  Q<-SF(pp)
+  type="supply"
+  SupplyDemand<-rbind(SupplyDemand,data.frame(p,Q,type))
+  
+}
+plt<-(ggplot(data=SupplyDemand,aes(x=Q,y=p,color=type))
+  +geom_path()+theme_bw()
+  +xlab("Q")+ylab("P")
+  +theme(legend.title = element_blank(),
+         legend.position=c(0.8,0.8))
+)
+```
+
+</div>
+
+<div style="float: left; width: 40%;">
+```{r, echo=F,fig.width=4}
+print(plt)
+```
+</div>
+
+
+
+## Point predictions from markets
+
+
+* Equilibrium price and quantity 
+* Which buyers trade?
+* Which sellers trade?
+* Consumer and producer surplus 
+
+```{r, echo=T}
+ExcessDemand<-apply(as.matrix(P),
+                    FUN = function(x) {DF(x)-SF(x)},
+                    MARGIN=1)
+
+Peq<-P[which.min(abs(ExcessDemand))]
+Qeq<-c(DF(Peq),SF(Peq))
+
+# equilibrium price
+print(Peq)
+
+# equilibrium quantity
+print(Qeq)
+
+```
+
+## Point predictions
+
+<div style="float: left; width: 40%;">
+
+```{r,echo=T}
+plt<-(plt
+      +geom_hline(yintercept=Peq,
+                  color="black",
+                  linetype="dashed")
+      +geom_vline(xintercept=Qeq,
+                  color="black",
+                  linetype="dashed")
+)
+
+CS<-sum((Demand %>% filter(v>=Peq))$v)
+print(CS)
+
+PS<-sum((Supply %>% filter(c<=Peq))$c)
+print(PS)
+
+
+```
+</div>
+
+<div style="float: left; width: 60%;">
+```{r, echo=F,fig.width=6}
+plt
+```
+</div>
+
+## Comparative static predictions
+
+What happens to any of the above if?
+
+* Supply or demand shift?
+* The government imposes a tax?
+* The government subsidizes the good?
+* The government imposes a price floor or ceiling?
   
 ## Other take-aways
 
