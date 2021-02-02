@@ -1,0 +1,196 @@
+---
+title: "ECON 4/6260 - Behaviroal Economics"
+subtitle: "03 - Risk and Decision Making"
+author: "Dr. James Bland"
+
+
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+---
+
+<style>
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,cache=T)
+library(ggplot2)
+library(dplyr)
+set.seed(42)
+```
+
+## Risk and uncertainty
+
+Common attributes of many decisions that we make:
+
+* Should I drive my car today?
+* Should eat something that has a "sell by" date of one week ago?
+* If I go to the grocery store, what is the probability that I will contract COVID-19?
+* Should I study and revise a particular slide for an exam?
+
+Here we will make a distinction between:
+
+* **Risk** I know (or at least can estimate) the probabilities of events when I make my decisions:
+  + Die rolls
+  + Gambling at a casino
+  + Buying car insurance (if I know the probability that I will crash)
+* **Uncertainty** I don't know the probabilities when I make my decisions:
+  + If you don't know the motivations of others
+  + If the decision problem is too complicated
+  
+In this chapter, we will focus on **Risk**
+
+## Example: Insurance
+
+> I can buy car insurance for $P. The following table shows probabilities and outcomes of particular events.
+
+```{r, echo=F}
+
+W<-30000
+
+Event<-c("1 - no crash","2 - a minor ding","3 - panel replaced","4 - three panels replaced","5 - new engine","6 - car totaled")
+Probability<-rep(paste("1/6"),6)
+Loss<-(0:5)^(3)*100
+Initial.Wealth<-rep(W,6)
+Without.Insurance<-Initial.Wealth-Loss
+With.Insurance<-paste(Initial.Wealth," - P")
+
+
+
+Tab<-data.frame(Event,Probability,Loss,Initial.Wealth,Without.Insurance,With.Insurance)
+
+knitr::kable(Tab)
+
+```
+
+How much am I willing to pay for this insurance?
+
+## Expected value
+
+One approach would be to determine the expected value of having and not having insurance. The insurance guarantees that my bank balance will be $\$ `r paste(W)`-P$. What is my "average" bank balance if I do not purchase the insurance?
+
+**Definition: Expected value **: if $X$ is a real-valued random variable with probability mass function $p_X(x)=\Pr(X=x)$, and support $\mathbb X$ (the possible values of $X$) then the expected value (or expectation) of $X$ is:
+
+$$
+\begin{aligned}
+E(X)&=\sum_{x\in\mathbb X} x p_X(x)
+\end{aligned}
+$$
+  
+*example on doc cam*
+
+## Expected Value
+
+Support : $\mathbb X =\{ `r paste(Without.Insurance)`\}$
+
+Probability mass function:
+$$p_X(x)=\begin{cases}
+\frac16 &\text{if }x\in\mathbb X\\
+0&\text{Otherwise}
+\end{cases}
+$$
+
+```{r,echo=F,results="asis"}
+SumStr<-paste(Without.Insurance,"\\times",rep("\\frac16",6))
+
+PrintThis<-c(
+  "$$\\begin{aligned}",
+  "E(x)&=\\sum_{x\\in\\mathbb X} x p_X(x) \\\\ \n",
+  paste("&=",paste(SumStr,collapse="+"),collapse=""),
+  "\\\\ \n",
+  paste("&=",sum(Without.Insurance/6)),
+  "\\\\ \n",
+  "\\end{aligned}$$"
+)
+
+
+cat(PrintThis)
+
+```
+
+Therefore you will be willing to pay $P=\$30000-`r paste(sum(Without.Insurance/6))`=\$`r paste(30000-sum(Without.Insurance/6))`$ for the insurance.
+
+
+
+
+
+
+
+## But most people care about risk!
+
+$$
+\begin{aligned}
+\mathbb X = \{\$1,\$2,\$3\}
+,\ L_1:\ p^1_X = \{0.5,0.0, 0.5\} ,\quad L_2:\ p^2_X = \{0.0,1.0, 0.0\}
+\end{aligned}
+$$
+
+Most people would choose $L_2$ in this situation.
+
+## Expected utility theory
+
+Instead of maximizing:
+
+$$
+E(X)=\sum_{x\in\mathbb X} xp_X(x)
+$$
+
+People maximize expected utility:
+$$
+EU=\sum_{x\in\mathbb X} u(x)p_X(x)
+$$
+
+where $u(x)$ is a "utility (of money) function"
+
+* $u$ is *increasing*
+* If $u$ is concave, this I am risk-averse
+* If $u$ is convex, this I am risk-loving
+
+## Insurance with risk aversion
+
+Assume $u(x)=x^\alpha$ (replace $\alpha=0.5$ for $u(x)=\sqrt x$ if it helps)
+
+Expected utility without insurance
+
+```{r,results="asis"}
+SumStr<-paste(Without.Insurance,"^\\alpha")
+
+PrintThis<-c(
+  "$$\\begin{aligned}",
+  "E(u(x))&=\\sum_{x\\in\\mathbb X} u(x) p_X(x) =\\sum_{x\\in\\mathbb X} x^\\alpha p_X(x) \\\\ \n",
+  paste("&=\\frac16\\left(",paste(SumStr,collapse="+"),"\\right)",collapse=""),
+  "\\end{aligned}$$"
+)
+cat(PrintThis)
+
+```
+For $\alpha=0.5$, this becomes `r paste(round(sum(Without.Insurance^0.5 /6),1))`
+
+Expected utility with insurance:
+
+$$
+E(u(30000-P))=(30000-P)^\alpha
+$$
+
+So you should buy insurance if and only if:
+
+```{r,results="asis"}
+SumStr<-paste(Without.Insurance,"^\\alpha")
+
+PrintThis<-c(
+  "$$\\begin{aligned}",
+  "(30000-P)^\\alpha &\\geq",
+  paste("\\frac16\\left(",paste(SumStr,collapse="+"),"\\right)",collapse=""),
+  "\\\\",
+  paste("P&\\leq 30000-\\left(\\frac16\\left(",paste(SumStr,collapse="+"),"\\right)\\right)^{\\frac1\\alpha}",collapse=""),
+  "\\end{aligned}$$"
+)
+cat(PrintThis)
+
+```
+
+## Insurance with risk aversion and deductible
+
+Insurance does not pay the first $\$D$ of damages
