@@ -191,6 +191,85 @@ cat(PrintThis)
 
 ```
 
+## Insurance with risk aversion - graphically
+
+```{r, echo=F}
+
+r<-c(1,seq(0.2,1.2,length=1001))
+
+p<-c()
+for (rr in r) {
+  p=c(p,max(c(W-sum((1/6)*Without.Insurance^rr),0)))
+}
+plotThis<-data.frame(r,p)
+
+(
+  ggplot(data=plotThis,aes(x=r,y=p))
+  +geom_line(size=2)
+  +theme_bw()
+  +xlab("risk aversion parameter r")
+  +ylab("Willingness to pay ($)")
+  +geom_vline(xintercept=1,linetype="dashed")
+)
+
+
+
+
+
+```
+
+
 ## Insurance with risk aversion and deductible
 
 Insurance does not pay the first $\$D$ of damages
+
+```{r}
+
+Tab$With.Insurance<-paste0("W - P - ",Tab$Loss," + max(",Tab$Loss,"-D, 0)")
+
+knitr::kable(Tab %>% select(Event,Without.Insurance,With.Insurance))
+```
+Buy insurance if:
+
+$$
+\begin{aligned}
+EU(\text{with insurance})&\geq EU(\text{without insurance})\\
+\frac16\sum_{k=1}^6 (W-L_k-P+\max(L_k-D,0))^r&\geq\frac16\sum_{k=1}^6 (W-L_k)^r
+\end{aligned}
+$$
+
+## This one is better solved numerically
+
+```{r,echo=F}
+library(rootSolve)
+rgrid<- seq(0.2,0.9,length=100)
+Dgrid<- c(200,500,800)
+W<-30000
+L<-c(0,100,800,2700,6400,12500)
+pgrid<-seq(1,30000,length=100)
+
+PlotThis<-data.frame()
+for (rr in rgrid) {
+  for (dd in Dgrid) {
+    SolveThis<-function(p) {
+      sum((W-L-p+max(L-dd,0))^rr)-sum((W-L)^rr)
+    }
+    findZero<-abs(apply(as.matrix(pgrid),1,SolveThis))
+    findZero[is.na(findZero)]<-10^6
+    II<-which.min(findZero)
+    p<-pgrid[II]
+    
+    tmp<-data.frame(p)
+    tmp$Deductible<-paste0("$",dd)
+    tmp$r<-rr
+    PlotThis<-rbind(PlotThis,tmp)
+    
+  }
+}
+
+(
+ ggplot(PlotThis,aes(x=r,y=p,color=Deductible)) 
+  +geom_line()
+)
+
+```
