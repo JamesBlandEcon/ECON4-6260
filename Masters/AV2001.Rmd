@@ -1,32 +1,9 @@
----
-title: "Replication of Andreoni & Vesterlund (201)"
-author: "ECON 6260 (Dr. James Bland)"
-date: "1/27/2021"
-output: html_document
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 
 
-## wrangle from Matlab
-library(R.matlab)
-M <- readMat('AV2001.mat')
-
-AV2001choices<-cbind(M$female,M$keep)
-colnames(AV2001choices)<-c("female","keep1","keep2","keep3","keep4","keep5","keep6","keep7","keep8")
-
-AV2001parameters<-rbind(M$income,M$self,M$other)
-rownames(AV2001parameters)<-c("income","pSelf","pOther")
-
-AV2001parameters<-t(AV2001parameters)
-
-write.csv(AV2001choices,file="AV2001choices.csv")
-write.csv(AV2001parameters,file="AV2001parameters.csv")
-
-```
+## Reading: Which is the fair sex?
 
 > Andreoni, James, and Lise Vesterlund. "Which is the fair sex? Gender differences in altruism." The Quarterly Journal of Economics 116, no. 1 (2001): 293-312.
+
 
 ```{r loaddata}
 
@@ -37,16 +14,19 @@ library(tidyr)
 params<-data.frame((read.csv("AV2001parameters.csv")))
 D<-read.csv("AV2001choices.csv")
 
-Keep<-(data.frame(D[,c(1,3:10)]) 
-        %>% gather("X","TokensKept")      
+D$id<-D$X
+
+Keep<-(data.frame(D)
+        %>% gather(Decision,keep,keep1:keep8)
+        %>% mutate(Decision=(as.numeric(gsub("keep", "", Decision)))
+                             )
 )
-head(Keep)
-Female<-D[,2]
+
 
 knitr::kable((params))
 ```
 
-## plot the budget sets
+### plot the budget sets
 ```{r}
 params<-(params
          %>% mutate(
@@ -65,3 +45,72 @@ params<-(params
 )
 ```
 
+### Classification into 3 types of subject 
+
+$$
+\begin{aligned}
+\text{selfish: } u(x,y)&=x\\
+\text{perfect substitutes: } u(x,y) &= x + \alpha y\\
+\text{perfect complements: } u(x,y) &=\min\{x,\alpha y\}
+\end{aligned}
+$$
+
+We will just set $\alpha =1$
+
+```{r}
+
+
+params<-params %>% mutate(selfish=-1,PC=-1,PS=-1)
+
+for (xx in unique(params$X)) {
+  
+  d<-params %>% filter(X==xx)
+  pass<-0:d$income
+  KeepGrid<-d$income-pass
+  
+  self<-(d$income-pass)/d$pSelf
+  other<-pass/d$pOther
+  
+  Payoffselfish<-self
+  Selfish<-KeepGrid[which.max(Payoffselfish)]
+  
+  PayoffPS<-self + other
+  PS<-KeepGrid[which.max(PayoffPS)]
+  
+  PayoffPC<-self*(self<=other)+other*(self>other)
+  PC<-KeepGrid[which.max(PayoffPC)]
+  
+  params[xx,]$selfish<-Selfish
+  params[xx,]$PS<-PS
+  params[xx,]$PC<-PC
+  
+  
+  
+}
+
+
+SSR<- (Keep  %>% left_join(params %>% mutate(Decision=X) ,by="Decision")
+  %>% mutate(resid2_selfish=(selfish-keep)^2,
+             resid2_PC=(PC-keep)^2,
+             resid2_PS=(PS-keep)^2,
+             )
+ %>% group_by(id)
+ %>% summarize(SSR_selfish=sum(resid2_selfish),
+               SSR_PC=sum(resid2_PC),
+               SSR_PS=sum(resid2_PS))
+)
+
+TypeList<-c("Selfish","PC","PS")
+
+SSR$type<-TypeList[apply(SSR %>% select(SSR_selfish,SSR_PC,SSR_PS),1,FUN=which.min)]
+SSR<-(SSR %>% mutate(Perfect = (SSR_selfish*SSR_PC*SSR_PS)==0)
+ %>% group_by(type,Perfect)
+ %>% summarize(count = n())
+)
+
+
+knitr::kable(SSR)
+
+
+
+```
