@@ -1,0 +1,128 @@
+---
+title: "ECON 4/6260 - Behaviroal Economics"
+subtitle: "05 - Bayes' Rule"
+author: "Dr. James Bland"
+
+
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+---
+
+<style>
+.forceBreak { -webkit-column-break-after: always; break-after: column; }
+</style>
+
+```{r,include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,cache=T)
+library(ggplot2)
+library(dplyr)
+set.seed(42)
+```
+
+# Bayes' rule
+
+$$
+\Pr(A \mid B)=\frac{\Pr(B \mid A)\Pr(A)}{\Pr(B)}
+$$
+
+## In comparison to Chapter 3 (risk)
+
+**Risk:**
+
+* I know the probabilities of events. I make my decisions bases on:
+  + These probabilities
+  + My preferences over events
+* Core model for decision-making with risk:
+  + Expected Utility Theory
+  + Maximize $E[u(X)]$
+  
+**Beliefs:**
+
+* How do we get those probabilities?
+* If I receive new information, how should I change my beliefs?
+* Do people actually do this?
+
+## Conditional probability
+
+> What is the probability of an event, **given that I know another event has happened**?
+
+* What is the probability that I slip on the sidewalk given that ...
+  + It is snowing?
+  + It is not snowing?
+  + It is snowing, and the temperature is below $10^\circ\mathrm F$?
+* What is the probability that I get an exam question on Bayes' rule, given that ...
+  + Dr. B only spends fifteen minutes discussing it in class
+  + Dr. B spends three classes discussing it
+  + Dr. B says "There will be a question on the exam on Bayes' rule"
+
+
+## Example
+
+* I roll a 6-sided die, and tell you that it is an odd number. 
+  + What is the probability that I have rolled a 3?
+  + What is the probability that it is a number less than or equal to 3?
+
+
+
+
+... working on doc cam
+
+We would notate these probabilities like this:
+$$
+\Pr(X=3 \mid X \text{ is odd}),\quad \Pr(X=3 \mid X \leq 3)
+$$
+
+## More generally
+
+$$
+\begin{aligned}
+\Pr(A \cap B)&=\Pr(A \mid B) \Pr(B)\\
+\Pr(\text{events A and B are both true})&=\Pr(\text{event A is true given that B is true})\Pr(\text{B is true})
+\end{aligned}
+$$
+
+And we can swap the label of events $A$ and $B$, so:
+$$
+\begin{aligned}
+\Pr(B \cap A) &=\Pr(B \mid A)\Pr(A)
+\end{aligned}
+$$
+
+But the LHS of both of these expressions are the same event $(A\cap B)=(B\cap A)$, so
+$$
+\begin{aligned}
+\Pr(A \cap B) &=\Pr(A\mid B)\Pr(B)=\Pr(B\mid A)\Pr(A)=\Pr(B \cap A)
+\end{aligned}
+$$
+Dividing both sides of the middle equality by $\Pr(B)$:
+$$
+\Pr(A\mid B)=\frac{\Pr(B\mid A)\Pr(A)}{\Pr(B)}
+$$
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

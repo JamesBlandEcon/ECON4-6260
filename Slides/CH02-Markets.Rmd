@@ -19,9 +19,9 @@ library(dplyr)
 set.seed(42)
 ```
 
-## Markets
+# Markets
 
-### Markets
+## Markets
 
 
 * Probably one of the first things you learned about in a *Principles of Microeconomics* course
@@ -39,15 +39,12 @@ However:
 
 (why not?)
 
----
 
-### An experiment
+## An experiment
 
 ...
 
----
-
-### Induced value theory
+## Induced value theory
 
 Simple version: *Pay people enough money, and they will behave as if these are their incentives*
 
@@ -64,9 +61,7 @@ Then they will only choose action $a$ if $A \geq B$, and will only choose action
 * Participants need to understand how their actions lead to payments
 * Participants need to believe that their actions will lead to payments
 
----
-
-### In market experiments
+## In market experiments
 
 * Each buyer $i$ has values $v_{i,1}\geq v_{i,2}\geq v_{i,3} \ldots$.
 * Each seller $j$ has costs $c_{i,1}\leq c_{i,2}\leq c_{i,3} \ldots$.
@@ -76,9 +71,7 @@ Then they will only choose action $a$ if $A \geq B$, and will only choose action
   
 (if this is the first trade for both)
 
----
-
-### Numerical example - Buyers
+## Numerical example - Buyers
 
 
 
@@ -112,9 +105,7 @@ print(plt)
 ```
 
 
----
-
-### Numerical example - Sellers
+## Numerical example - Sellers
 
 
 There are 20 sellers, each seller has a cost equal to a 10-sided die roll, and can sell at most 2 items:
@@ -146,9 +137,7 @@ print(plt)
 
 
 
----
-
-### Numerical example - Supply and demand curves
+## Numerical example - Supply and demand curves
 
 ```{r, echo=T}
 P<-seq(0,20,length=1000) # prices to evaluate quantity
@@ -177,17 +166,15 @@ plt<-(ggplot(data=SupplyDemand,aes(x=Q,y=p,color=type))
          legend.position=c(0.8,0.8))
 )
 ```
+
 ---
 
 ```{r, echo=F,fig.width=4}
 print(plt)
 ```
 
----
 
-
-
-### Point predictions from markets
+## Point predictions from markets
 
 
 * Equilibrium price and quantity 
@@ -213,9 +200,8 @@ print(Qeq)
 
 
 
----
 
-### Point predictions
+## Point predictions
 
 
 
@@ -245,11 +231,9 @@ plt
 ```
 
 
-\
 
----
 
-### Comparative static predictions
+## Comparative static predictions
 
 What happens to any of the above if?
 
@@ -258,9 +242,7 @@ What happens to any of the above if?
 * The government subsidizes the good?
 * The government imposes a price floor or ceiling?
   
----
-  
-### Other take-aways
+## Other take-aways
 
 * Market theory remains silent on *how* buyers and sellers discover the equilibrium price
 * Market theory remains silent on whether different trading mechanisms affect price discovery.

@@ -15,11 +15,9 @@ knitr::opts_chunk$set(echo = FALSE)
 library(ggplot2)
 set.seed(42)
 ```
----
+# Introduction
 
-## Introduction
-
-### Boring stuff first: Expectation for class
+## Boring stuff first: Expectation for class
 
 * We will start and finish on time
 * Attendance is expected
@@ -28,9 +26,7 @@ set.seed(42)
 * You have read and understand the Syllabus
 * For all classroom experiments, at least one person will be paid. You will understand the payment mechanism before starting an experiment.
 
----
-
-### What will we be studying?
+## What will we be studying?
 
 * Insights from Psychology
   + Especially judgment & decision-making
@@ -41,9 +37,7 @@ set.seed(42)
 * Experimental methods
 * Non-experimental methods
 
----
-
-### Doing economic research without experiments
+## Doing economic research without experiments
 
 Research question $\rightarrow$ I need data
 
@@ -58,9 +52,7 @@ I have data $\rightarrow$ what questions can I answer?
 * Still difficult to establish a causal relationship
 * Still (often) requires untestable assumptions
 
----
-
-### Economic experiments
+## Economic experiments
 
 We will be using economic experiments to learn about concepts in Behavioral Economics.
 
@@ -71,9 +63,7 @@ Mostly, we will use *laboratory experiments*
 * Give them a task to perform, and observe their behavior.
 * Pay them money based on their decisions
 
----
-
-### Why pay money?
+## Why pay money?
 
 Mankiw's *10 Principles of Economics*: "4. People respond to incentives"
 
@@ -88,9 +78,7 @@ This means that:
 * Payments need to care enough about the reward mechanism that they will respond to it
   + We can't pay you in chocolate or Monopoly money, or ask you to make hypothetical choices. We use US dollars!
 
----
-
-### How this will work for ECON4/6260
+## How this will work for ECON4/6260
 
 
 * I have approval from the Department of Economics to pay you in US dollars
@@ -101,15 +89,11 @@ This means that:
 * This is not my money, so don't feel badly about taking it
 * Don't rely on it for lunch, car payments, etc.
 
----
-
-### And now for our first experiment
+## And now for our first experiment
 
 ...
 
----
-
-### Reasons for running an experiment 
+## Reasons for running an experiment 
 
 Studying theoretical predictions
 
@@ -133,9 +117,7 @@ Further reading:
 
 > Nikiforakis, Nikos. ["For the student: experimental economics."](https://onlinelibrary.wiley.com/doi/full/10.1111/j.1467-8462.2010.00607.x?casa_token=K6AYdLRDvdAAAAAA%3AideO69vzWNyKiBui76sE4jOLASAPBw0JoDZ97Uxy0POWYZ_pOV-T1feeFWAOtUdY9fWIYXcFSNGe3RJ6) Australian Economic Review 43, no. 3 (2010): 337-345.
 
----
-
-### Studying theoretical predictions - I
+## Studying theoretical predictions - I
 
 Suppose that you have a theory that makes a prediction $f(x)$ for situation $x$.
 
@@ -154,9 +136,7 @@ e.g.:
 
 *When are each of these useful?*
 
----
-
-### Studying theoretical predictions - II
+## Studying theoretical predictions - II
 
 **Comparing two or more theories**
 
@@ -187,9 +167,7 @@ plt<-(
 plt
 ```
 
----
-
-### Studying theoretical predictions - III
+## Studying theoretical predictions - III
 
 **Comparing two or more theories**: Sometimes both are important!
 
@@ -214,9 +192,7 @@ plt<-(
 plt
 ```
 
----
-
-### Studying theoretical predictions - IV
+## Studying theoretical predictions - IV
 
 **Comparing two or more theories**: Sometimes they are all useless
 
@@ -240,9 +216,7 @@ plt<-(
 plt
 ```
 
----
-
-### Economic experiments and causality
+## Economic experiments and causality
 
 Conduct a study that resembles a drug trial.
 
@@ -262,9 +236,7 @@ Economic experiments:
 * Instead of drugs, we will be treating people with *different incentives*
 * Many field experiments use this format, e.g the work associated with the [2019 Nobel prize in Economics](https://www.nobelprize.org/prizes/economic-sciences/2019/press-release/)
 
----
-
-### Complement to data from outside the lab
+## Complement to data from outside the lab
 
 Example: ECON1200 model of a market.
 
@@ -285,9 +257,7 @@ Inside the lab:
 * We can assign buyers and sellers values and costs
 * Hence, we know what the theory predicts, and we can observe the outcomes.
 
----
-
-### A roadmap for this course
+## A roadmap for this course
 
 Usually, I will introduce a topic with an experiment.
 
@@ -297,9 +267,7 @@ We will discuss this in the next class
 
 For 6260 students, we will use our extra hour mostly as a reading group. I will assign the first few readings, but I am very open to suggestions. 
 
----
-
-### Outline of topics covered (not necessarily in order)
+## Outline of topics covered (not necessarily in order)
 
 * Game theory
   + How do economists model interactions in small groups?

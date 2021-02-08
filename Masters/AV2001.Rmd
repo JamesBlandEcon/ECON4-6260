@@ -1,9 +1,12 @@
 
 
-## Reading: Which is the fair sex?
+# Reading: Which is the fair sex?
 
 > Andreoni, James, and Lise Vesterlund. "Which is the fair sex? Gender differences in altruism." The Quarterly Journal of Economics 116, no. 1 (2001): 293-312.
 
+```{r AV2001Opts,echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
+```
 
 ```{r loaddata}
 
@@ -26,7 +29,7 @@ Keep<-(data.frame(D)
 knitr::kable((params))
 ```
 
-### plot the budget sets
+## plot the budget sets
 ```{r}
 params<-(params
          %>% mutate(
@@ -45,7 +48,7 @@ params<-(params
 )
 ```
 
-### Classification into 3 types of subject 
+## Classification into 3 types of subject 
 
 $$
 \begin{aligned}

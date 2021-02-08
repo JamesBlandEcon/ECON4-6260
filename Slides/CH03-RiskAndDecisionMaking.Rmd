@@ -21,11 +21,10 @@ library(dplyr)
 set.seed(42)
 ```
 
-## Risk and decision-making
+# Risk and decision-making
 
----
 
-### Risk and uncertainty
+## Risk and uncertainty
 
 Common attributes of many decisions that we make:
 
@@ -46,9 +45,7 @@ Here we will make a distinction between:
   
 In this chapter, we will focus on **Risk**
 
----
-
-### Example: Insurance
+## Example: Insurance
 
 > I can buy car insurance for $P. The following table shows probabilities and outcomes of particular events.
 
@@ -74,9 +71,7 @@ knitr::kable(Tab)
 How much am I willing to pay for this insurance?
 
 
----
-
-### Expected value
+## Expected value
 
 One approach would be to determine the expected value of having and not having insurance. The insurance guarantees that my bank balance will be $\$ `r paste(W)`-P$. What is my "average" bank balance if I do not purchase the insurance?
 
@@ -90,9 +85,8 @@ $$
   
 *example on doc cam*
 
----
 
-### Expected Value
+## Expected Value
 
 Support : $\mathbb X =\{ `r paste(Without.Insurance)1\}$
 
@@ -124,13 +118,8 @@ cat(PrintThis)
 Therefore you will be willing to pay $P=\$30000-`r paste(sum(Without.Insurance/6))`=\$`r paste(30000-sum(Without.Insurance/6))`$ for the insurance.
 
 
----
 
-
-
-
-
-### But most people care about risk!
+## But most people care about risk!
 
 $$
 \begin{aligned}
@@ -141,9 +130,8 @@ $$
 
 Most people would choose $L_2$ in this situation.
 
----
 
-### Expected utility theory
+## Expected utility theory
 
 Instead of maximizing:
 
@@ -162,9 +150,8 @@ where $u(x)$ is a "utility (of money) function"
 * If $u$ is concave, this I am risk-averse
 * If $u$ is convex, this I am risk-loving
 
----
 
-### Insurance with risk aversion
+## Insurance with risk aversion
 
 Assume $u(x)=x^\alpha$ (replace $\alpha=0.5$ for $u(x)=\sqrt x$ if it helps)
 
@@ -207,9 +194,8 @@ cat(PrintThis)
 
 ```
 
----
 
-### Insurance with risk aversion - graphically
+## Insurance with risk aversion - graphically
 
 ```{r, echo=F}
 
@@ -233,67 +219,5 @@ plotThis<-data.frame(r,p)
 
 
 
-
-```
-
----
-
-### Insurance with risk aversion and deductible
-
-Insurance does not pay the first $\$D$ of damages
-
-```{r}
-
-Tab$With.Insurance<-paste0("W - P - ",Tab$Loss," + max(",Tab$Loss,"-D, 0)")
-
-knitr::kable(Tab %>% select(Event,Without.Insurance,With.Insurance))
-```
-Buy insurance if:
-
-$$
-\begin{aligned}
-EU(\text{with insurance})&\geq EU(\text{without insurance})\\
-\frac16\sum_{k=1}^6 (W-L_k-P+\max(L_k-D,0))^r&\geq\frac16\sum_{k=1}^6 (W-L_k)^r
-\end{aligned}
-$$
-
----
-
-### This one is better solved numerically
-
-```{r,echo=F}
-library(rootSolve)
-rgrid<- seq(0.2,0.9,length=100)
-Dgrid<- c(200,400,800)
-W<-30000
-L<-c(0,100,800,2700,6400,12500)
-pgrid<-seq(1,30000,length=100)
-
-PlotThis<-data.frame()
-for (rr in rgrid) {
-  for (dd in Dgrid) {
-    SolveThis<-function(p) {
-      lmd<-L-dd
-      lmd[lmd<=0]<-0
-      sum((W-L-p+lmd)^rr)-sum((W-L)^rr)
-    }
-    findZero<-abs(apply(as.matrix(pgrid),1,SolveThis))
-    findZero[is.na(findZero)]<-10^6
-    II<-which.min(findZero)
-    p<-pgrid[II]
-    
-    tmp<-data.frame(p)
-    tmp$Deductible<-paste0("$",dd)
-    tmp$r<-rr
-    PlotThis<-rbind(PlotThis,tmp)
-    
-  }
-}
-
-(
- ggplot(PlotThis,aes(x=r,y=p,color=Deductible)) 
-  +geom_line()
-  +theme_bw()
-)
 
 ```

@@ -2,8 +2,7 @@
 title: "ECON 4-6260 Behavioral Economics"
 author: "James Bland"
 date: "Spring 2021"
-output:
-  bookdown::gitbook: default
+output: bookdown::gitbook
 ---
 
 ```{r setupThis, include=FALSE}
@@ -11,7 +10,7 @@ library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
 ```
 
-# Common content (both ECON 4260 and ECON 6260)
+# Common content (both ECON 4260 and ECON 6260) {-}
 
 ```{r,child=c("Slides/CH01-Introduction.Rmd")}
 
@@ -25,7 +24,11 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
 
 ```
 
-# Masters-only content (ECON 6260)
+```{r,child=c("Slides/CH05-BayesRule.Rmd")}
+
+```
+
+# Masters-only content (ECON 6260) {-}
 
 
 
@@ -35,7 +38,7 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
 
 
 
-# Problem sets
+# Problem sets {-}
 
 ```{r,child=c("../ProblemSets/PS01-GuessingGame.Rmd")}
 ```
