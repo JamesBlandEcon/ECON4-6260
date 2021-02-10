@@ -6,3 +6,5 @@ readxl
 stargazer
 sandwich
 latex2exp
+knitr
+kableExtra

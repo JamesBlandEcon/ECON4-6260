@@ -5,9 +5,11 @@ date: "Spring 2021"
 output: bookdown::gitbook
 ---
 
-```{r setupThis, include=FALSE}
+```{r, include=FALSE}
 library(ggplot2)
 knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
+
+#rmarkdown::render("index.Rmd",output_dir="C:/Users/jbland/Documents/JamesBlandEcon.github.io/ECON46260-Spring2020")
 ```
 
 # Common content (both ECON 4260 and ECON 6260) {-}
@@ -36,6 +38,10 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
 
 ```
 
+```{r,child=c("Masters/ParametricRecoverability.Rmd")}
+
+```
+
 
 
 # Problem sets {-}
@@ -53,4 +59,10 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
 ```
 
 ```{r,child=c("../ProblemSets/PS03-Risk.Rmd")}
+```
+
+```{r,child=c("../ProblemSets/PS03-Risk-SOLUTIONS.Rmd")}
+```
+
+```{r,child=c("../ProblemSets/PS04-Bayes.Rmd")}
 ```

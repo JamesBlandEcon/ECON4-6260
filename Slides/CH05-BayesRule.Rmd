@@ -101,18 +101,84 @@ $$
 \Pr(A\mid B)=\frac{\Pr(B\mid A)\Pr(A)}{\Pr(B)}
 $$
 
+## Example from PS3 - I
+
+```{r}
+
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+# load the data
+D<-data.frame(read.csv("../../ProblemSets/PS03Data.csv"))
+P<-data.frame(read.csv("../../ProblemSets/PS03Parameters.csv"))
+
+r<-0.2
+
+P<-(P 
+  %>% mutate(
+    EVA = Aprob1*Aprize1 + Aprob2*Aprize2 + Aprob3*Aprize3,
+    EVB = Bprob1*Bprize1 + Bprob2*Bprize2 + Bprob3*Bprize3,
+    EUA = Aprob1*Aprize1^r + Aprob2*Aprize2^r + Aprob3*Aprize3^r,
+    EUB = Bprob1*Bprize1^r + Bprob2*Bprize2^r + Bprob3*Bprize3^r)
+)
 
 
+P<-(P
+    %>% mutate(EV_ChooseA = 1*(EVA>=EVB),EU_ChooseA = 1*(EUA>=EUB))
+)
+
+D<-(D %>% left_join(P,by="Problem.Number")
+      %>% mutate(ChoseA = 1*(Decision=="a"))
+    %>% filter(Round<=10)
+)
+
+knitr::kable(head(D %>% select(ID,EV_ChooseA,EU_ChooseA,ChoseA)))
+
+```
+
+## Example, II
+
+```{r,echo=T}
+DSum<-D %>% group_by(ID) %>% summarize(ChooseEV = sum(ChoseA==EV_ChooseA),
+                                       ChooseEU = sum(ChoseA==EU_ChooseA),
+                                       Count=n())
+                                       
+knitr::kable(DSum)
+```
+
+## Example, III
+
+Suppose that we have the following model for decisions:
+
+$$
+\begin{aligned}
+p(\text{ChooseEV}=1\mid \theta,\tau=\text{EV})&=\theta\\
+p(\text{ChooseEU}=1\mid \theta,\tau=\text{EU})&=\theta\\
+p(\theta)&=I(\theta\in(0,1))\quad\text{(uniform)}\\
+p(\tau=\text{EU})&=\rho\\
+p(\rho)&=I(\rho\in(0,1))
+\end{aligned}
+$$
+We can write the likelihood, conditional on each type, as:
+$$
+p(y\mid \tau,\theta,\rho)=\theta^{y_\tau}(1-\theta)^{n-y_{\tau}}
+$$
+And so the overall, or "grand" likelihood is:
+$$
+p(y\mid \theta,\rho)=\rho \theta^{n^{EV}}(1-\theta)^{n-n_{EV}}+(1-\rho) \theta^{n^{EU}}(1-\theta)^{n-n_{EU}}
+$$
+and since both our priors are equal to one for values in the support, this is also (proportional to) the posterior:
+$$
+p(\theta,\rho\mid y)\propto\rho \theta^{n^{EV}}(1-\theta)^{n-n_{EV}}+(1-\rho) \theta^{n^{EU}}(1-\theta)^{n-n_{EU}}
+$$
+
+## Example - IV
+
+```{r}
+pgrid<-seq(0.01,0.99,length=99)
 
 
-
-
-
-
-
-
-
-
+```
 
 
 

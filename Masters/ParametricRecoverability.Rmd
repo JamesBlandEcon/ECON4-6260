@@ -1,0 +1,128 @@
+
+
+# Parametric recoverability of preferences
+
+> Halevy, Yoram, Dotan Persitz, and Lanny Zrill. "Parametric recoverability of preferences." Journal of Political Economy 126, no. 4 (2018): 1558-1593.
+
+```{r,echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
+```
+
+
+## Experiment design
+
+1. Subjects made decisions that were similar to Anderoni & Vesterlund (2001): (close to) continuous, consumer's problem. 22 choices. Used these to estimate preferences 2 different ways. $\hat\theta_i^{SS}$ (sum of squares, nonlinear least squares) $\hat\theta^{MM}$ (money metric).
+2. Subjects get 9 binary choices, which are designed to separate out $\hat\theta^{SS}$ and $\hat\theta^{MM}$
+
+## Example using AV2001's data
+
+```{r}
+
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+
+
+params<-data.frame((read.csv("AV2001parameters.csv")))
+colnames(params)[1]<-"Decision"
+
+D<-read.csv("AV2001choices.csv")
+
+D$id<-D$X
+
+Keep<-(data.frame(D)
+        %>% gather(Decision,keep,keep1:keep8)
+        %>% mutate(Decision=(as.numeric(gsub("keep", "", Decision)))
+                             )
+       %>% left_join(params,by="Decision")
+       %>% mutate(
+         fraction_kept = keep/income,
+         fraction_passed = (income-keep)/income,
+       )
+)
+ 
+```
+
+
+```{r}
+Keep %>% head %>% knitr::kable() 
+```
+
+**Model**: Assume subjects have Cobb-Douglas preferences:
+
+$$
+U(s,o)=s^\alpha o^{1-\alpha}
+$$
+
+Define SSR as the error in both the self- and the other-direction, in terms of the fraction of tokens.
+
+$$
+\begin{aligned}
+\max\{s^\alpha o^{1-\alpha}\}&\quad s.t.\ 1=\frac{s}{p^s}+\frac{o}{p^o}\\
+\max\{\alpha\log s +(1-\alpha)\log o\}&\quad s.t.\ 1=\frac{s}{p^s}+\frac{o}{p^o}\\
+\max\{\alpha \log s+(1-\alpha)\log(p^o-s/p^s)\}\\
+\max\{\alpha\log(k/p^s)+(1-\alpha)\log((1-k)/p^o)\}\\
+\max\{\alpha\log(k)-\alpha\log p^s+(1-\alpha)\log((1-k))-(1-\alpha)\log p^o\}\\
+\max\{\alpha\log(k)+(1-\alpha)\log(1-k)\}\\
+\end{aligned}
+$$
+
+First-order condition:
+$$
+\begin{aligned}
+0=&\frac{\alpha}{k^*}-\frac{1-\alpha}{1-k^*}\\
+(1-k^*)\alpha&=k^*(1-\alpha)\\
+k^*&=\alpha 
+\end{aligned}
+$$
+So if we define SSR as:
+$$
+\begin{aligned}
+SSR(\alpha)&=\sum_{t=1}^T\left((\alpha-k_t)^2+(1-\alpha-(1-k_t))^2\right)\\
+&=\sum_{t=1}^T\left((\alpha-k_t)^2+(1-\alpha-1+k_t)^2\right)\\
+\text{FOC: } 0&=\sum_{t=1}^T\left(-2(\hat\alpha-k_t)+2(1-\hat\alpha-1+k_t)\right)\\
+&=2T\left(-\hat\alpha+\bar k+1-\hat\alpha-1+\bar k\right)\\
+&=2T(2\bar k -2\hat\alpha)\\
+\hat\alpha^{SS}&=\bar k
+\end{aligned}
+$$
+i.e. $\hat\alpha^{SS}=$average fraction kept.
+
+```{r}
+
+library(latex2exp)
+
+ESTIMATES<-(Keep
+            %>% group_by(id)
+            %>% summarize(ahatSS = mean(fraction_kept))
+  
+)
+
+(
+  ggplot(ESTIMATES)
+  +stat_ecdf(aes(x=ahatSS,color="SS estimate"))
+  +theme_bw()
+  +xlab("Estimate")+ylab("Empirical cumulative density")
+)
+
+```
+
+## For this paper
+
+Data available here.: https://raw.githubusercontent.com/persitzd/RP-Toolkit/master/Data%20Files/Data_HPZ_2018.csv
+
+```{r}
+D<-read.csv("Data_HPZ_2018.csv")
+
+D %>% head() %>% knitr::kable()
+
+```
+
+
+
+
+
+
+
+
+
