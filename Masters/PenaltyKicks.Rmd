@@ -1,0 +1,132 @@
+
+
+
+```{r , include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message=FALSE,cache=TRUE)
+library(knitr)
+library(kableExtra)
+```
+
+# Penalty Kicks and MSNE
+
+```{r}
+library(tidyverse)
+
+# Source: kaggle.com/mauryashubham/english-premier-league-penalty-dataset-201617
+EPL<-(read.csv("penalty_data.csv") 
+      %>% tibble()
+      %>% mutate(Y = 1*(Scored=="Scored"))
+        )
+EPL %>% sample_n(10) %>% knitr::kable()
+print(dim(EPL))
+```
+
+
+```{r}
+
+EPLcounts<-matrix(0,3,3)
+colnames(EPLcounts)<-c("L","C","R")
+rownames(EPLcounts)<-c("L","C","R")
+EPLscored<-EPLcounts
+
+for (ii in c("L","C","R")) {
+  for (jj in c("L","C","R")) {
+    EPLcounts[ii,jj]<-dim(EPL %>% filter(Kick_Direction==ii & Keeper_Direction==jj))[1]
+    EPLscored[ii,jj]<-dim(EPL %>% filter(Kick_Direction==ii & Keeper_Direction==jj & Scored=="Scored"))[1]
+  }
+} 
+
+EPLKickerPayoff<-EPLscored/EPLcounts
+colnames(EPLKickerPayoff)<-c("l","c","r")
+print(EPLKickerPayoff)
+```
+
+## Other datasets:
+
+> Azar, Ofer H., and Michael Bar-Eli. "Do soccer players play the mixed-strategy Nash equilibrium?." Applied Economics 43, no. 25 (2011): 3591-3601.
+
+**Their Table 1, 3, 4**
+
+```{r}
+# Counts
+ABcounts<-rbind(c(54,1,37),c(41,10,31),c(46,7,59))
+#Stopped kicks
+ABstopped<-rbind(c(16,0,0),c(4,6,1),c(0,0,15))
+
+ABKickerPayoff<-1-ABstopped/ABcounts
+colnames(ABKickerPayoff)<-c("l","c","r")
+rownames(ABKickerPayoff)<-c("L","C","R")
+print(ABKickerPayoff)
+```
+
+> Chiappori, P-A., Steven Levitt, and Timothy Groseclose. "Testing mixed-strategy equilibria when players are heterogeneous: The case of penalty kicks in soccer." American Economic Review 92, no. 4 (2002): 1138-1151.
+
+**Their tables 3 and 4**
+
+```{r}
+# Counts
+CLGcounts<-t(rbind(c(117,48,95),c(4,3,4),c(85,28,75)))
+
+
+CLGKickerPayoff<-t(rbind(c(0.632,0.812,0.895),c(1.00,0,1.00),c(0.941,0.893,0.440)))
+colnames(CLGKickerPayoff)<-c("l","c","r")
+rownames(CLGKickerPayoff)<-c("L","C","R")
+print(CLGKickerPayoff)
+```
+
+## MSNE - empirical payoffs
+
+Note that we can solve for MSNE by noting that all expected payoffs must be constant, and that probabilities must add to 1:
+
+$$
+\begin{aligned}
+EU(a)&=\text{a constant}\\
+U_ip_i&=c\\
+p_i&=U_i^{-1}c\\
+\text{probabilities must add to 1:}
+\\
+p_i&=U_i^{-1}c / \sum_a U_i^{-1}c = U_i^{-1}c / \sum_a U_i^{-1}c
+\end{aligned}
+$$
+Only works if payoffs are all non-negative, but we can always add a large constant to $U$ to fix this, and not change any of the incentives.
+```{r}
+
+U<-list(CLG=CLGKickerPayoff,AB=ABKickerPayoff,EPL=EPLKickerPayoff)
+
+COUNTS<-list(CLG=CLGcounts,AB=ABcounts,EPL=EPLcounts)
+
+D<-tibble()
+
+action<-c("L","C","R")
+
+for (ii in 1:length(U)) {
+  uu<-U[[ii]]
+  cc<-COUNTS[[ii]]
+  
+  pERow<-cc%*%c(1,1,1)/sum(cc)
+  pECol<-t(cc)%*%c(1,1,1)/sum(cc)
+  pNashCol<-solve(uu)%*%c(1,1,1)/sum(solve(uu)%*%c(1,1,1))
+  pNashRow<-solve(t(1-uu))%*%c(1,1,1)/sum(solve(t(1-uu))%*%c(1,1,1))
+  D<-tibble(pNashRow,pERow,pECol,pNashCol,action)%>% mutate(
+    data = names(U)[ii]
+    ) %>% rbind(D)
+  
+}
+
+D %>% kbl()  %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")
+
+```
+
+```{r}
+(
+  ggplot()
+  +geom_point(data=D,aes(x=pNashRow,y=pERow,color="Kicker",shape=data))
+    +geom_point(data=D,aes(x=pNashCol,y=pECol,color="Keeper",shape=data))
+  +geom_abline(slope=1,intercept=0)
+  +geom_smooth(data=D,aes(x=pNashRow,y=pERow,color="Kicker"),method="lm",alpha=0.2)
+    +geom_smooth(data=D,aes(x=pNashCol,y=pECol,color="Keeper"),method="lm",alpha=0.2)
+  +theme_bw()
+  +xlab("MSNE prediction")
+  +ylab("Empirical frequencies")
+)
+```

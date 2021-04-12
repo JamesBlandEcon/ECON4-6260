@@ -14,6 +14,100 @@ knitr::opts_chunk$set(echo = TRUE,warning = FALSE,message=FALSE,cache=TRUE)
 1. Subjects made decisions that were similar to Anderoni & Vesterlund (2001): (close to) continuous, consumer's problem. 22 choices. Used these to estimate preferences 2 different ways. $\hat\theta_i^{SS}$ (sum of squares, nonlinear least squares) $\hat\theta^{MM}$ (money metric).
 2. Subjects get 9 binary choices, which are designed to separate out $\hat\theta^{SS}$ and $\hat\theta^{MM}$
 
+## The "money metric"
+
+The consumer's problem is:
+$$
+\max_{x\in\mathbb R^k_+} u(x)\quad\text{subject to: } p^\top x\leq w
+$$
+where:
+
+* $x$ is a vector describing a bundle of goods.
+* $k$ is the number of goods (i.e. $\mathrm{length}(x)=k$)
+* $p$ is a vector pf prices (again, $\mathrm{length}(p)=k$)
+* $u$ is the consumer's utility function of bundle of goods $x$
+* $w$ is the consumer's budget
+
+Suppose that a consumer chooses $x$ when faced with prices $p$ and budget $w$. This generates utility $u(x)$. The money metric identifies the cheapest budget $m'$ where the consumer could have purchased a bundle $y$ such that $u(y)\geq u(x)$. That is:
+$$
+m(x,p,u)=\min_{y\in\mathbb R^k_+}p^\top y\quad\text{subject to: } u(y)\geq u(x)
+$$
+**Example:** Suppose that we have Cobb-Douglas preferences $u(x)=x_1^\alpha x_2^{1-\alpha}$, budget $w$ and price $p$. Then in this instance:
+
+$$
+\begin{aligned}
+m(x,p,u)&=\min_{y\in \mathbb R^2_+} p^\top y\quad\text{subject to: } u(y)\geq u(x)\\
+\text{Lagrangian: }\mathcal L&=p^\top y-\lambda(u(x)-u(y))\\
+\text{equivalent to: }\mathcal L&=p^\top y-\lambda(\log u(x)-\log u(y))\\
+&=p^\top y-\lambda\left(\log u(x)-\alpha \log y_1-(1-\alpha)\log y_2\right)\\
+\text{FOCs: }0&=p_1+\lambda\frac{\alpha}{y_1}\\
+0&=p_2+\lambda\frac{1-\alpha}{y_2}\\
+0&=\log u(x)-\alpha \log y_1-(1-\alpha)\log y_2
+\end{aligned}
+$$
+(assuming that the utility constraint binds, which it will in Cobb-Douglas). Solving this:
+$$
+\begin{aligned}
+-\lambda&=\frac{p_1y_1}{\alpha}=\frac{p_2y_2}{1-\alpha}\\
+p_1y_1(1-\alpha)&=\alpha p_2y_2\\
+y_2 &=\frac{p_1y_1(1-\alpha)}{\alpha p_2}
+\end{aligned}
+$$
+Substitute this back into the utility constraint:
+$$
+\begin{aligned}
+0&=\alpha\log x_1+(1-\alpha)\log x_2-\alpha\log y_1-(1-\alpha)\left(\log y_1+\log\left(\frac{p_1(1-\alpha)}{\alpha p_2}\right)\right)\\
+\log y_1&=\alpha\log x_1+(1-\alpha)\log x_2-(1-\alpha)\log\left(\frac{p_1(1-\alpha)}{\alpha p_2}\right)
+\end{aligned}
+$$
+And so I could be made just as happy with:
+$$
+m=p_1y_1+p_2y_2\leq p_1x_1+p_2x_2
+$$
+In the paper, the authors use the fractional money metric:
+$$
+M=1-m/w
+$$
+If this is close to zero, the consumer is close to optimization. If this is close to 1, then the consumer is not close to optimizing.
+
+```{r}
+library(ggplot2)
+library(latex2exp)
+p<-c(1,2)
+w<-30
+alpha<-0.8
+x<-c(w/(2*p[1]),w/(2*p[2]))
+
+Ux<-x[1]^alpha*x[2]^(1-alpha)
+
+xx<-seq(0,w,length=100)
+yy<-(Ux/(xx^alpha))^(1/(1-alpha))
+
+IndiffCurve<-(data.frame(xx,yy)
+ %>% mutate(Expenditure=xx*p[1]+yy*p[2])             
+)
+
+MMbundle<-IndiffCurve[which.min(IndiffCurve$Expenditure),]
+
+(
+  ggplot()
+  +geom_abline(aes(intercept=w/p[2],slope=-p[1]/p[2],color="Budget"))
+  +geom_path(data=IndiffCurve,aes(x=xx,y=yy,color="Indifference curve"))
+  +geom_abline(aes(intercept=MMbundle$Expenditure/p[2],slope=-p[1]/p[2],color="MM budget"))
+  +geom_text(aes(x=x[1],y=x[2],label="x"))
+  +geom_text(data=MMbundle,aes(x=xx,y=yy,label="y"))
+  +xlim(c(0,w/p[1]+1.2))+ylim(c(0,w/p[2]*1.2))
+  +theme_bw()
+  +xlab(TeX("$x_1$"))+ylab(TeX("$x_2$"))
+  #+xlim(c(0,20))+ylim(c(0,20))
+)
+
+M<-1-MMbundle$Expenditure/w
+print(M)
+
+```
+
+
 ## Example using AV2001's data
 
 ```{r}
@@ -88,37 +182,161 @@ SSR(\alpha)&=\sum_{t=1}^T\left((\alpha-k_t)^2+(1-\alpha-(1-k_t))^2\right)\\
 $$
 i.e. $\hat\alpha^{SS}=$average fraction kept.
 
-```{r}
+```{r,warning=F,cache=T}
 
 library(latex2exp)
 
+MMaHat<-function(keep,income,pSelf,pOther) {
+  x<-cbind(keep/pSelf,(income-keep)/pOther)
+  xx<-seq(0.01,max(income/pSelf),length=1000)
+  MM_SSR<-function(alpha) {
+    Ux<-x[,1]^alpha*x[,2]^(1-alpha)
+    MM<-0*Ux
+    for (ii in 1:length(Ux)) {
+      yy<-(Ux[ii]/(xx^alpha))^(1/(1-alpha))
+      m<-min(pSelf[ii]*xx+pOther[ii]*yy)
+      MM[ii]<-(1-m/income[ii])
+      
+    }
+    
+    sum(MM^2)
+    
+    
+  }
+  optim(0.5, MM_SSR)$par
+  
+}
+
+
 ESTIMATES<-(Keep
             %>% group_by(id)
-            %>% summarize(ahatSS = mean(fraction_kept))
+            %>% summarize(ahatSS = mean(fraction_kept),
+                          ahatMM = MMaHat(keep,income,pSelf,pOther))
   
 )
 
+```
+
+```{r}
+
 (
-  ggplot(ESTIMATES)
-  +stat_ecdf(aes(x=ahatSS,color="SS estimate"))
+  ggplot()
+  +stat_ecdf(data=ESTIMATES,aes(x=ahatSS,color="Minimize SSE",linetype="Estimates"))
+  +stat_ecdf(data=ESTIMATES,aes(x=ahatMM,color="Minimize Money metric",linetype="Estimates"))
   +theme_bw()
+  +geom_vline(aes(xintercept=c(0.5,1),linetype="Some important values"))
   +xlab("Estimate")+ylab("Empirical cumulative density")
 )
 
+(
+  ggplot(data=ESTIMATES,aes(x=ahatSS,y=ahatMM))
+  +geom_point()
+  +theme_bw()
+  +xlab("Sum of squares estimate")+ylab("MM estimate")
+  +geom_abline(intercept=0,slope=1,color="red")
+  +geom_vline(xintercept=0.5,color="blue")
+  +geom_hline(yintercept=0.5,color="blue")
+  
+)
+
 ```
+
+Which one makes better predictions?
+
+Leave-one-out cross-validation: For each participant, estimate $\alpha$ using all but observation $t$. How well does this predict the choice in row $t$?
+
+```{r,cache=T,warning=F}
+aMM<-c()
+aSS<-c()
+for (rr in 1:dim(Keep)[1]) {
+  ii<-Keep$id[rr]
+  UseData<-Keep[1:dim(Keep)[1]!=rr,] %>% filter(id==ii)
+  aMM[rr]<-MMaHat(UseData$keep,UseData$income,UseData$pSelf,UseData$pOther) 
+  aSS[rr]<-mean(UseData$fraction_kept)
+}
+
+LOOEstimates<-cbind(Keep,data.frame(aMM,aSS))
+
+```
+
+```{r}
+head(LOOEstimates) %>% knitr::kable()
+
+(
+  ggplot(LOOEstimates)
+  +geom_point(aes(y=fraction_kept,x=aMM,color="MM"))
+  +geom_smooth(aes(y=fraction_kept,x=aMM,color="MM"))
+  +geom_point(aes(y=fraction_kept,x=aSS,color="SS"))
+  +geom_smooth(aes(y=fraction_kept,x=aSS,color="SS"))
+  +geom_abline(intercept=0,slpoe=1)
+  +ylab("actual fraction kept")
+  +xlab("prediction")
+  +theme_bw()
+  
+)
+
+LOOEstimates %>% summarize(
+                  MM_MSE = mean((fraction_kept-aMM)^2),
+                  SS_MSE = mean((fraction_kept-aSS)^2),
+) %>% knitr::kable()
+```
+
 
 ## For this paper
 
 Data available here.: https://raw.githubusercontent.com/persitzd/RP-Toolkit/master/Data%20Files/Data_HPZ_2018.csv
 
+From the documentation:
+```{matlab,eval=F}
+% file_path is the path (including name file) to the data file to be turned to a matrix 
+% locations is a 6-length vector:
+%   1 - column number of Subject ID in the matrix
+% 	2 - column number of observation number of the subject
+% 	3 - column number of the quantity of good 1 chosen by the subject.
+% 	4 - column number of the quantity of good k chosen by the subject.
+%       the columns of quantities of goods 1 to k are in locations(3):locations(4).   
+% 	5 - column number of the max quantity of good 1 (=1/price).
+% 	6 - column number of the max quantity of good k (=1/price).
+%       the columns of max quantities of goods 1 to k are in locations(5):locations(6).   
+
+```
+
+
 ```{r}
-D<-read.csv("Data_HPZ_2018.csv")
+D<-read.csv("Data_HPZ_2018.csv",header=F)
+colnames(D)<-c("ID","ObsNum","Good1","Good2","Max1","Max2")
+
+D<-D %>% mutate(
+                Price1=1/Max1,Price2=1/Max2,
+                Budget = Good1*Price1+Good2*Price2)
 
 D %>% head() %>% knitr::kable()
 
 ```
 
 
+```{matlab,eval=F}
+% The function formats a data file to a matrix
+
+% file_path is the path (including name file) to the data file to be turned to a matrix 
+%   column 1 is the Subject ID in the matrix.
+% 	column 2 is observation number of the subject.
+%   columns 3-4 are the actual choice that was made.
+% 	starting column 5 and onwards, every pair of of columns (i.e. (5,6), (7,8), (9,10), ...)     
+%   represent a bundle that the consumer could have chosen.
+%   the number of optional bundles can differ between observations.
+```
+
+```{r}
+
+DFinite<-(
+  read.csv("Data_CFGK_2007.csv",header=F)
+  %>% data.frame()
+)
+colnames(DFinite)<-c("id","ObsNum","Choice1a","Choice1b","Choice2a","Choice2b")
+
+DFinite %>% head() %>% knitr::kable()
+```
 
 
 

@@ -2,3 +2,5 @@ base
 ggplot2
 dplyr
 tidyr
+lattice
+latex2exp

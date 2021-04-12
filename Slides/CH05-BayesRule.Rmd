@@ -154,35 +154,129 @@ $$
 \begin{aligned}
 p(\text{ChooseEV}=1\mid \theta,\tau=\text{EV})&=\theta\\
 p(\text{ChooseEU}=1\mid \theta,\tau=\text{EU})&=\theta\\
-p(\theta)&=I(\theta\in(0,1))\quad\text{(uniform)}\\
-p(\tau=\text{EU})&=\rho\\
-p(\rho)&=I(\rho\in(0,1))
+p(\tau=\text{EV})&=\rho\\
 \end{aligned}
 $$
-We can write the likelihood, conditional on each type, as:
+We can write the likelihood, conditional on each type, as (assuming each decision is independent):
 $$
-p(y\mid \tau,\theta,\rho)=\theta^{y_\tau}(1-\theta)^{n-y_{\tau}}
+p(y_i\mid \tau,\theta,\rho)=\theta^{y_{i,\tau}}(1-\theta)^{n-y_{i,\tau}}
 $$
-And so the overall, or "grand" likelihood is:
+And so the overall likelihood for an individual subject is:
 $$
-p(y\mid \theta,\rho)=\rho \theta^{n^{EV}}(1-\theta)^{n-n_{EV}}+(1-\rho) \theta^{n^{EU}}(1-\theta)^{n-n_{EU}}
-$$
-and since both our priors are equal to one for values in the support, this is also (proportional to) the posterior:
-$$
-p(\theta,\rho\mid y)\propto\rho \theta^{n^{EV}}(1-\theta)^{n-n_{EV}}+(1-\rho) \theta^{n^{EU}}(1-\theta)^{n-n_{EU}}
+p(y_i\mid \theta,\rho)=\rho \theta^{n_i^{EV}}(1-\theta)^{n_i-n_i^{EV}}+(1-\rho) \theta^{n_i^{EU}}(1-\theta)^{n_i-n_i^{EU}}
 $$
 
-## Example - IV
 
-```{r}
-pgrid<-seq(0.01,0.99,length=99)
 
+## Example, IV
+
+If we assume that each subjects' choices are independent, then the likelihood of observing all of the data in the experiment is:
+
+$$
+\begin{aligned}
+p(y\mid \theta,\rho)&\prod_{i=1}^Np(y_i\mid \theta,\rho)\\
+&=\prod_{i=1}^N\left(\rho \theta^{n_i^{EV}}(1-\theta)^{n_i-n_i^{EV}}+(1-\rho) \theta^{n_i^{EU}}(1-\theta)^{n_i-n_i^{EU}}\right)
+\end{aligned}
+$$
+where $\prod_{i=1}^Nx_i=x_1\times x_2\times x_3\times\ldots\times x_N$
+
+In words: if we knew the fraction of EU types $\rho$, and the probability of making a mistake $\theta$, then the probability that we observed our data $y$ is $p(y\mid \theta,\rho)$.
+
+## Example, V
+
+We have $p(y\mid \theta,\rho)$, but want to construct beliefs about $\theta$ and $\rho$. Applying Bayes' rule:
+
+$$
+\begin{aligned}
+p(A\mid B)&=\frac{p(B\mid A)p(A)}{p(B)}\\
+\text{substitute: } A&=(\rho,\theta), B=y\\
+p(\rho,\theta\mid y)&=\frac{p(y\mid\rho,\theta)p(\rho,\theta)}{p(y)}\\
+&=\frac{p(\rho,\theta)}{p(y)}\prod_{i=1}^N\left(\rho \theta^{n_i^{EV}}(1-\theta)^{n_i-n_i^{EV}}+(1-\rho) \theta^{n_i^{EU}}(1-\theta)^{n_i-n_i^{EU}}\right)
+\end{aligned}
+$$
+Note that since $p(y)$ is not a function of $\theta$ or $\rho$, we can write:
+$$
+p(\theta,\rho\mid y)\propto p(\theta,\rho)\prod_{i=1}^N\left(\rho \theta^{n_i^{EV}}(1-\theta)^{n_i-n_i^{EV}}+(1-\rho) \theta^{n_i^{EU}}(1-\theta)^{n_i-n_i^{EU}}\right)
+$$
+
+
+## Example, VI
+
+$$
+p(\theta,\rho\mid y)\propto p(\theta,\rho)\prod_{i=1}^N\left(\rho \theta^{n_i^{EV}}(1-\theta)^{n_i-n_i^{EV}}+(1-\rho) \theta^{n_i^{EU}}(1-\theta)^{n_i-n_i^{EU}}\right)
+$$
+All that is left is to specify priors. Let's make our life easy:
+
+* Assume that my beliefs about $\rho$ and $\theta$ are independent. That is, before observing the experiment, $p(\rho\mid\theta)=p(\rho)$, and $p(\theta\mid\rho)=p(\theta)$
+* $\rho$: Fraction of EV types. Must be a number between 0 and 1. Assume that any real number in this interval is equally likely.
+* $\theta$: Probability that a subject chooses the action that their type specifies. Again this is a probability, so it must be between 0 and 1. However, since this is the probability of following their type's action, it makes sense that $\theta>0.5$
+
+$$
+\begin{aligned}
+p(\theta,\rho)&=p(\theta)p(\rho)=\begin{cases}\frac{1}{2}&\text{ if } 0.5<\theta<1 \text{ and } 0<\rho<1\\
+0&\text{ otherwise}
+\end{cases}
+\end{aligned}
+$$
+
+## Example, VII
+
+Putting this all together:
+
+$$
+p(\theta,\rho\mid y)\propto
+\frac{1}{2}\prod_{i=1}^N\left(\rho \theta^{n_i^{EV}}(1-\theta)^{n_i-n_i^{EV}}+(1-\rho) \theta^{n_i^{EU}}(1-\theta)^{n_i-n_i^{EU}}\right)
+$$
+
+for $0.5<\theta<1$ and  $0<\rho<1$, zero otherwise.
+
+This is a much easier problem for my computer than for me.
+
+## Example, VIII
+
+
+```{r,echo=TRUE}
+pgrid<-as.matrix(seq(0.01,0.99,0.01))
+tgrid<-as.matrix(seq(0.51,0.99,0.01))
+
+
+THETA<-tgrid %*% (matrix(1,1,dim(pgrid)[1]))
+RHO<-t(pgrid %*% (matrix(1,1,dim(tgrid)[1])))
+
+LogLikelihood<-0*THETA
+
+for (ii in DSum$ID) {
+II<-DSum$ID==ii
+LogLikelihood<-LogLikelihood+log(
+     RHO*(THETA^DSum[II,]$ChooseEV)*(1-THETA)^(DSum[II,]$Count-DSum[II,]$ChooseEV)
+    +(1-RHO)*THETA^DSum[II,]$ChooseEU*(1-THETA)^(DSum[II,]$Count-DSum[II,]$ChooseEU)
+)
+}
+
+Posterior<-exp(LogLikelihood)/sum(exp(LogLikelihood))
 
 ```
 
 
+## Example, IX
+```{r,echo=T}
+library(latex2exp) 
+theta<-as.vector(THETA)
+rho<-as.vector(RHO)
+Post<-as.vector(Posterior) 
+plotthis<-data.frame(theta,rho,Post)
+plt<-(
+  ggplot(plotthis,aes(x=theta,y=rho,fill=Post))+geom_tile()
+  +theme_bw()+xlab(TeX("$\\theta$"))+ylab(TeX("$\\rho$"))
+)
+```
 
 
+## Example, X
+
+```{r}
+plt 
+```
 
 
 

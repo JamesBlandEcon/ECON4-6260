@@ -1,0 +1,263 @@
+---
+title: "ECON 4/6260 - Behaviroal Economics"
+subtitle: "Introduction to Game Theory"
+author: "Dr. James Bland"
+
+
+output:
+  ioslides_presentation:
+    widescreen: true
+    smaller: true
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(kableExtra)
+knitr::opts_chunk$set(echo = FALSE,cache=FALSE)
+```
+
+
+# Introduction to Game Theory
+
+## Game theory {.unlisted .unnumbered}
+
+* **Game theory** is the analysis of strategic interactions.
+
+* A **game** is a decision problem in which the final
+outcome depends upon the decisions of all players, as
+well as the state of the world.
+
+* A **strategy** is a complete plan of action that describes
+what a player will do under all possible circumstances.
+
+* The **payoff matrix** represents the payoffs associated
+with each possible combination of strategies.
+    + Describe how every combination of action that each player could take results in payoffs for each player
+    + Typically, we think about payoffs as utility , not money. Think about what that means about risk preferences. However in experiments, we pay in cash, not utility.
+    
+## Examples of payoff matrices {.unlisted .unnumbered}
+
+:::: {style="display: flex;"}
+
+::: {}
+
+```{r}
+
+# From Agner Table 1.4
+Game1<-rbind(c("2, 2", "0, 0"),c("0, 0", "1, 1"))
+colnames(Game1)<-c("left","right")
+rownames(Game1)<-c("Up","Down")
+Game1 %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic") %>% add_header_above(header = c("Game 1" = 3))
+
+Game2<-rbind(c("5, 1", "2, 0"),c("5, 1", "1, 2"))
+colnames(Game2)<-c("left","right")
+rownames(Game2)<-c("Up","Down")
+Game2 %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")%>% add_header_above(header = c("Game 2" = 3))
+
+Game<-rbind(c("5, 5", "0, 6"),c("6, 0", "2, 2"))
+colnames(Game)<-c("left","right")
+rownames(Game)<-c("Up","Down")
+Game %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")%>% add_header_above(header = c("Game 3" = 3))
+```
+:::
+
+::: {}
+$\quad$
+:::
+
+::: {}
+
+```{r}
+
+
+Game<-rbind(c("5, 5", "0, 2"),c("2, 0", "2, 2"))
+colnames(Game)<-c("left","right")
+rownames(Game)<-c("Up","Down")
+Game %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")%>% add_header_above(header = c("Game 4" = 3))
+
+Game<-rbind(c("2, 1", "0, 0"),c("0, 0", "1, 2"))
+colnames(Game)<-c("left","right")
+rownames(Game)<-c("Up","Down")
+Game %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")  %>% add_header_above(header = c("Game 5" = 3))
+
+Game3<-rbind(c("6, 2", "5, 1","4, 3"),c("3, 6", "8, 4","2, 1"),c("2, 8","9, 6", "3, 0"))
+colnames(Game3)<-c("left","middle","right")
+rownames(Game3)<-c("Up","Middle","Down")
+Game3 %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")  %>% add_header_above(header = c("Game 6" = 4))
+```
+
+:::
+
+::: {}
+$\quad$
+:::
+
+::: {}
+
+```{r}
+
+# From Agner Table 1.4
+Game1<-rbind(c("5, 2", "1, 1"),c("1, 1", "2, 5"))
+colnames(Game1)<-c("left","right")
+rownames(Game1)<-c("Up","Down")
+Game1 %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic") %>% add_header_above(header = c("Game 7" = 3))
+
+Game2<-rbind(c("4, 1", "2, 0"),c("5, 1", "1, 2"))
+colnames(Game2)<-c("left","right")
+rownames(Game2)<-c("Up","Down")
+Game2 %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")%>% add_header_above(header = c("Game 8" = 3))
+
+Game<-rbind(c("1, 1", "0, 0"),c("0, 0", "0, 0"))
+colnames(Game)<-c("left","right")
+rownames(Game)<-c("Up","Down")
+Game %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")%>% add_header_above(header = c("Game 9" = 3))
+```
+
+:::
+
+::::
+
+## Best response {.unlisted .unnumbered}
+
+A player’s *best response* correspondence describes the set of
+strategies that maximize their utility, conditional on their opponent’s
+strategy.
+
+* Correspondence rather than function because sometimes there is
+more than one thing that can maximize your utility
+
+Examples
+
+* Pure coordination
+
+* Matching pennies
+
+* Rock, paper, scissors (assume draw yields zero payoff)
+
+* Rock, paper, scissors. Players get twice the payoff if they win by
+playing rock.
+
+## Dominant and dominated strategies {.unlisted .unnumbered}
+
+A *dominant strategy* is a strategy that is a best response no matter
+what your opponent’s strategy is
+
+* *Strictly dominant strategy*: a strategy that you would strictly prefer to
+play for any possible strategy your opponent could play
+
+* *Weakly dominant strategy*: a strategy that does at least as well as any
+other strategy you could play, against any possible strategy your
+opponent could play
+
+ A *Strictly dominated strategy* is a strategy that does strictly worse
+against all possible opposing strategy than some other strategy that
+you could play
+
+## Elimination of strictly dominated strategies {.unlisted .unnumbered}
+
+
+One solution concept for games is iterated elimination of strictly dominated strategies:
+
+1. Rule out all strictly dominated strategies
+
+2. Restrict analysis to the game where players’ strictly dominated strategies are eliminated
+
+3. Go back to step 1
+
+**Example: Cournot competition** -- Oligopoly, firms compete on quantity
+
+Demand curve:
+
+$$
+P=a-bQ
+$$
+Identical firms, each has marginal cost $c$, no other costs
+
+* $n=2$
+* $n=3$ (or larger)
+
+
+## Nash Equilibrium  {.unlisted .unnumbered}
+
+* Nash equilibrium is a strategy profile such that each player is playing their best strategy given the decision of the other players.
+
+* Nash’s Theorem states that every finite game that
+is, every game in which all players have a finite number of pure strategies has a Nash equilibrium.
+
+**Go back to examples earlier**
+
+## Not all games have a Nash equilibrium in **pure** strategies {.unlisted .unnumbered}
+
+**Example:** Rock, paper, scissors
+
+**Mixed strategy Nash equilibrium** (MSNE)
+
+Sometimes the comparative statics of MSNE are counter-intuitive, and sometimes not:
+
+:::: {style="display: flex;"}
+
+::: {}
+
+```{r}
+Game<-rbind(c("a, a", "0, 0"),c("0, 0", "1, 1"))
+colnames(Game)<-c("left","right")
+rownames(Game)<-c("Up","Down")
+Game %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")
+```
+
+:::
+
+::: {}
+$\quad\quad$
+:::
+
+::: {}
+
+```{r}
+Game<-rbind(c("a, 1", "0, 0"),c("0, 0", "1, a"))
+colnames(Game)<-c("left","right")
+rownames(Game)<-c("Up","Down")
+Game %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")
+```
+
+:::
+
+::: {}
+$\quad\quad$
+:::
+
+
+::: {}
+
+```{r}
+Game<-rbind(c("0, 0", "a, 1"),c("1, a", "1, 1"))
+colnames(Game)<-c("left","right")
+rownames(Game)<-c("Up","Down")
+Game %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")
+```
+
+:::
+
+::: {}
+$\quad\quad$
+:::
+
+::: {}
+
+```{r}
+Game<-rbind(c("0, 0", "a, 1"),c("1, a", "1, 1"))
+colnames(Game)<-c("left","right")
+rownames(Game)<-c("Up","Down")
+Game %>% kbl() %>% kable_styling(full_width=FALSE,htmltable_class="lightable-classic")
+```
+
+:::
+
+::::
+
+
+$$\text{how does MSNE change for } a>1 \text{?}$$
+
+## Mixed strategies example: penalty kicks in soccer {.unlisted .unnumbered}
+
+
